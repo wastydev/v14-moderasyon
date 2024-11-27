@@ -10,5 +10,7 @@
 ## Gerekli Modulleri Yükle!
 `npm install` komutunu cmd üzerinden veya terminal üzerinden kullanarak gerekli modülleri kurun.
 
+## MongoDB'yi unutma.
+
 ### Her değişiklikten sonra botu durdurup yeniden başlatmalısın!
 
