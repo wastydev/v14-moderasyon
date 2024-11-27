@@ -14,3 +14,6 @@
 
 ### Her değişiklikten sonra botu durdurup yeniden başlatmalısın!
 
+.env klasörü;
+DISCORD_TOKEN=your_discord_bot_token
+MONGO_URI=your_mongo_database_uri
