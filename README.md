@@ -14,7 +14,7 @@
 
 ### Her değişiklikten sonra botu durdurup yeniden başlatmalısın!
 
-# .env klasörü;
+### .env klasörü;
 
 DISCORD_TOKEN=your_discord_bot_token
 
