@@ -1,17 +1,18 @@
 module.exports = {
     name: 'yetkilisay',
-    description: 'Belirli bir roldeki kullanıcıları sayar ve çevrimiçi/çevrimdışı durumlarını kontrol eder.',
+    description: 'Belirli bir roldeki kullanıcıları sayar ve aktif/sesteki yetkili durumlarını kontrol eder.',
     async execute(message, args) {
-        // Rol adı argüman olarak veriliyor
-        const roleName = args[0];
+        // Burada rol ID'si belirleyeceğiz, direkt olarak koda yazılacak
+        const roleId = '1207378125491539998'; // Buraya belirtilen rolün ID'sini yazın
 
-        // Eğer rol adı verilmemişse, hata mesajı göster
-        if (!roleName) {
-            return message.reply('Lütfen bir rol adı belirtin.');
+        // Kullanıcının yeterli yetkiye sahip olup olmadığını kontrol et (örneğin, Admin rolü)
+        const requiredRole = 'Shareholder'; // Değiştirin: Yönetici rolü adı
+        if (!message.member.roles.cache.some(role => role.name === requiredRole) && !message.member.permissions.has('ADMINISTRATOR')) {
+            return message.reply('Bu komutu kullanmak için yeterli yetkiye sahip değilsiniz.');
         }
 
-        // Rolü bul
-        const role = message.guild.roles.cache.find(role => role.name === roleName);
+        // Rolü ID'ye göre bul
+        const role = message.guild.roles.cache.get(roleId);
         if (!role) {
             return message.reply('Belirtilen rol bulunamadı.');
         }
@@ -20,15 +21,24 @@ module.exports = {
         const membersWithRole = role.members;
 
         // Çevrimiçi ve çevrimdışı üyeleri ayır
-        const onlineMembers = membersWithRole.filter(member => member.presence && member.presence.status !== 'offline');
+        const onlineMembers = membersWithRole.filter(member => member.presence?.status !== 'offline');
         const offlineMembers = membersWithRole.filter(member => !member.presence || member.presence.status === 'offline');
 
-        // Sonuçları gönder
-        message.channel.send(`
-**${roleName} rolündeki toplam üye sayısı:** ${membersWithRole.size}
-**Çevrimiçi üye sayısı:** ${onlineMembers.size}
-**Çevrimdışı üye sayısı:** ${offlineMembers.size}
-**Çevrimiçi olmayan üyeler:** ${offlineMembers.map(member => member).join(', ')}
-        `);
+        // Seste bulunan üyeleri al
+        const membersInVoice = membersWithRole.filter(member => member.voice.channel);
+
+        // Embed mesajını oluştur
+        const resultEmbed = {
+            color: 0x00FF00, // Renk değerini hexadecimal formatta sayı olarak belirledik.
+            title: `**${role.name}** Rolündeki Yetkililer`,
+            fields: [
+                { name: 'Yetkili Sayısı', value: membersWithRole.size.toString(), inline: true },
+                { name: 'Aktif Yetkili Sayısı (Çevrimiçi)', value: onlineMembers.size.toString(), inline: true },
+                { name: 'Sesteki Yetkili Sayısı', value: membersInVoice.size.toString(), inline: true },
+            ],
+            timestamp: new Date(),
+        };
+
+        message.channel.send({ embeds: [resultEmbed] });
     }
 };
